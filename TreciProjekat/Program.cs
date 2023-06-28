@@ -1,47 +1,29 @@
 ﻿using Reddit;
 using Reddit.Controllers;
 using System;
+using System.Reactive.Concurrency;
+using System.Reactive.Linq;
+using VaderSharp;
 namespace TreciProjekat
 {
     internal class Program
     {
         static string clientId = Environment.GetEnvironmentVariable("REDDIT_API_CLIENT_ID");
         static string secret= Environment.GetEnvironmentVariable("REDDIT_API_SECRET");
-        //static string accessToken3 = Environment.GetEnvironmentVariable("REDDIT_API_TOKEN");
-
-
+        static string port = "8080/";
+        static string url = "http://localhost:" + port;
         static async Task Main()
         {
-            RedditAPI r = new RedditAPI();
-            string accessToken = await r.getAccessToken(clientId, secret);
-            RedditClient reddit = new RedditClient(accessToken: accessToken);
 
+            Console.WriteLine("Main thread...");
 
-            Subreddit subreddit = reddit.Subreddit("AskAcademia").About();
-            Console.WriteLine($"Subreddit Name: {subreddit.Description}");
+            string[] arguments = { url, clientId, secret };
 
-
-            List<Post> posts = subreddit.Posts.GetTop("all", "10"); // Replace "10" with the number of posts you want to retrieve
-
-            foreach (Post post in posts)
-            {
-                List<Comment> comments = post.Comments.GetComments();
-
-                foreach (Comment comment in comments)
-                {
-                    // Process each comment as needed
-                    Console.WriteLine(comment.Body);
-                }
-            }
+            WebServer server = new WebServer(arguments);
+            await server.Start();
 
         }
-
-
-
     }
-
-
-
 }
 
 
